@@ -327,6 +327,18 @@
 			    data = self.data("roundabout");
 
 			callback = callback || function() {};
+
+			if(relayout) {
+				// on relayout, create proportional resize pre-all-other-adjustments
+				data.relayoutProportion = self.width() / data.startWidth;
+				// console.log('relayout by ' + data.relayoutProportion);
+			} else {
+				data.relayoutProportion = 1;
+				data.startWidth = self.width();
+			}
+			// Update data after above
+			self.data("roundabout", data);
+
 			
 			self.children(data.childSelector).each(function(i) {
 				var startWidth, startHeight, startFontSize,
@@ -470,6 +482,7 @@
 			var factors,
 			    self = this,
 			    child = $(childElement),
+			    self_data = self.data("roundabout"),
 			    data = child.data("roundabout"),
 			    out = [],
 			    rad = methods.degToRad.apply(null, [(360.0 - data.degrees) + info.bearing]);
@@ -485,6 +498,10 @@
 			// correct
 			factors.scale = (factors.scale > 1) ? 1 : factors.scale;
 			factors.adjustedScale = (info.scale.min + (info.scale.diff * factors.scale)).toFixed(4);
+
+			// Adjust per responsive (@todo test, and also test according to an adjusted version of scale.min and scale.max)
+			factors.adjustedScale = factors.adjustedScale * self_data.relayoutProportion;
+
 			factors.width = (factors.adjustedScale * data.startWidth).toFixed(4);
 			factors.height = (factors.adjustedScale * data.startHeight).toFixed(4);
 
