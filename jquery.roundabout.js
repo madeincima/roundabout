@@ -672,6 +672,10 @@
 					    thisDuration = (!duration) ? data.duration : duration,
 					    thisEasingType = (easing) ? easing : data.easing || "swing";
 
+					if (!data) {
+						return;
+					}
+
 					// is this your first time?
 					if (!passedData) {
 						passedData = {
@@ -977,15 +981,17 @@
 		stopAutoplay: function(keepAutoplayBindings) {
 			return this
 				.each(function() {
-					clearInterval($(this).data("roundabout").autoplayInterval);
-					$(this).data("roundabout").autoplayInterval = null;
-					$(this).data("roundabout").autoplayIsRunning = false;
-					
+					if ($(this).data("roundabout")) {
+						clearInterval($(this).data("roundabout").autoplayInterval);
+						$(this).data("roundabout").autoplayInterval = null;
+						$(this).data("roundabout").autoplayIsRunning = false;
+					}
+
 					// this will prevent autoplayPauseOnHover from restarting autoplay
 					if (!keepAutoplayBindings) {
 						$(this).unbind(".autoplay");
 					}
-					
+
 					$(this).trigger("autoplayStop");
 				});
 		},
@@ -1099,10 +1105,14 @@
 			return this
 				.each(function() {
 					var self = $(this),
-					    settings = $.extend({}, self.data("roundabout"));
+					    settings;
 
-					settings.startingChild = self.data("roundabout").childInFocus;
-					methods.init.apply(self, [settings, null, true]);
+					if (self.data("roundabout")) {
+						settings = $.extend({}, self.data("roundabout"));
+
+						settings.startingChild = self.data("roundabout").childInFocus;
+						methods.init.apply(self, [settings, null, true]);
+					}
 				});
 		},
 
@@ -1211,6 +1221,9 @@
 
 			// Unbind window listeners
 			$(window).unbind(".roundabout");
+
+			// Clear autoplay timers
+			methods.stopAutoplay.apply(self);
 
 			// Unset classes and css on self
 			self
