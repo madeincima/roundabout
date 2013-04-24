@@ -981,11 +981,9 @@
 		stopAutoplay: function(keepAutoplayBindings) {
 			return this
 				.each(function() {
-					if ($(this).data("roundabout")) {
-						clearInterval($(this).data("roundabout").autoplayInterval);
-						$(this).data("roundabout").autoplayInterval = null;
-						$(this).data("roundabout").autoplayIsRunning = false;
-					}
+					clearInterval($(this).data("roundabout").autoplayInterval);
+					$(this).data("roundabout").autoplayInterval = null;
+					$(this).data("roundabout").autoplayIsRunning = false;
 
 					// this will prevent autoplayPauseOnHover from restarting autoplay
 					if (!keepAutoplayBindings) {
@@ -1107,12 +1105,10 @@
 					var self = $(this),
 					    settings;
 
-					if (self.data("roundabout")) {
-						settings = $.extend({}, self.data("roundabout"));
+					settings = $.extend({}, self.data("roundabout"));
 
-						settings.startingChild = self.data("roundabout").childInFocus;
-						methods.init.apply(self, [settings, null, true]);
-					}
+					settings.startingChild = self.data("roundabout").childInFocus;
+					methods.init.apply(self, [settings, null, true]);
 				});
 		},
 
