@@ -672,6 +672,10 @@
 					    thisDuration = (!duration) ? data.duration : duration,
 					    thisEasingType = (easing) ? easing : data.easing || "swing";
 
+					if (!data) {
+						return;
+					}
+
 					// is this your first time?
 					if (!passedData) {
 						passedData = {
@@ -980,12 +984,12 @@
 					clearInterval($(this).data("roundabout").autoplayInterval);
 					$(this).data("roundabout").autoplayInterval = null;
 					$(this).data("roundabout").autoplayIsRunning = false;
-					
+
 					// this will prevent autoplayPauseOnHover from restarting autoplay
 					if (!keepAutoplayBindings) {
 						$(this).unbind(".autoplay");
 					}
-					
+
 					$(this).trigger("autoplayStop");
 				});
 		},
@@ -1099,7 +1103,9 @@
 			return this
 				.each(function() {
 					var self = $(this),
-					    settings = $.extend({}, self.data("roundabout"));
+					    settings;
+
+					settings = $.extend({}, self.data("roundabout"));
 
 					settings.startingChild = self.data("roundabout").childInFocus;
 					methods.init.apply(self, [settings, null, true]);
@@ -1209,52 +1215,57 @@
 			var self = $(this),
 				data = self.data("roundabout");
 
-			// Unbind window listeners
-			$(window).unbind(".roundabout");
+			if (data) {
+				// Unbind window listeners
+				$(window).unbind(".roundabout");
 
-			// Unset classes and css on self
-			self
-				.removeClass("roundabout-holder")
-				.removeAttr("style");
+				// Clear autoplay timers
+				methods.stopAutoplay.apply(self);
 
-			// Unset classes and css on children
-			self
-				.children(data.childSelector)
-				.removeClass("roundabout-moveable-item")
-				.removeClass("roundabout-in-focus")
-				.removeData("roundabout")
-				.removeAttr("style");
+				// Unset classes and css on self
+				self
+					.removeClass("roundabout-holder")
+					.removeAttr("style");
 
-			// Universal unbind
-			self
-				.children(data.childSelector)
-				.andSelf()
-				.unbind(".roundabout")
-				.unbind(".roundabout.autoplay");
+				// Unset classes and css on children
+				self
+					.children(data.childSelector)
+					.removeClass("roundabout-moveable-item")
+					.removeClass("roundabout-in-focus")
+					.removeData("roundabout")
+					.removeAttr("style");
 
-			// un-bind buttons
-			if (data.btnNext) {
-				$(data.btnNext).unbind(".roundabout");
+				// Universal unbind
+				self
+					.children(data.childSelector)
+					.andSelf()
+					.unbind(".roundabout")
+					.unbind(".roundabout.autoplay");
+
+				// un-bind buttons
+				if (data.btnNext) {
+					$(data.btnNext).unbind(".roundabout");
+				}
+				if (data.btnPrev) {
+					$(data.btnPrev).bind(".roundabout");
+				}
+				if (data.btnToggleAutoplay) {
+					$(data.btnToggleAutoplay).bind(".roundabout");
+				}
+				if (data.btnStartAutoplay) {
+					$(data.btnStartAutoplay).bind(".roundabout");
+				}
+				if (data.btnStopAutoplay) {
+					$(data.btnStopAutoplay).bind(".roundabout");
+				}
+
+
+				// @todo: Can we namespace the element.addEventListeners set in the "// on mobile" section?
+
+				// Remove all assigned Data
+				self
+					.removeData("roundabout");
 			}
-			if (data.btnPrev) {
-				$(data.btnPrev).bind(".roundabout");
-			}
-			if (data.btnToggleAutoplay) {
-				$(data.btnToggleAutoplay).bind(".roundabout");
-			}
-			if (data.btnStartAutoplay) {
-				$(data.btnStartAutoplay).bind(".roundabout");
-			}
-			if (data.btnStopAutoplay) {
-				$(data.btnStopAutoplay).bind(".roundabout");
-			}
-
-
-			// @todo: Can we namespace the element.addEventListeners set in the "// on mobile" section?
-
-			// Remove all assigned Data
-			self
-				.removeData("roundabout");
 		}
 	};
 
